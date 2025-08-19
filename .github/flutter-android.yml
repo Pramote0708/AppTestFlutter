@@ -43,9 +43,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # ถ้ามี secret สำหรับ keystore Android ให้ถอดรหัสและบันทึกไฟล์
+      - name: Decode Android Keystore
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/upload-keystore.jks
+
+      # สร้างไฟล์ APK แบบ release
       - name: Build APK
         run: flutter build apk --release
 
+      # อัปโหลดไฟล์ APK ที่สร้างขึ้นเป็น artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
